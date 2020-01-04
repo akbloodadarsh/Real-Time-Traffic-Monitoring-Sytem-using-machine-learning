@@ -192,10 +192,12 @@ net.setPreferableTarget(cv.dnn.DNN_TARGET_CPU)
 # To set the name of window
 v_window = 'vehicles'
 p_window = 'pedestrians'
+# To open the frame which is bigger in size
 cv.namedWindow(v_window, cv.WINDOW_NORMAL)
+cv.namedWindow(p_window, cv.WINDOW_NORMAL)
 # To set size of video o/p window
-cv.resizeWindow(v_window, inpWidth, inpHeight)
-cv.resizeWindow(p_window, inpWidth, inpHeight)
+cv.resizeWindow(v_window, 700, 450)
+cv.resizeWindow(p_window, 700, 450)
 
 # To import video
 cap = cv.VideoCapture('test1')
@@ -205,7 +207,7 @@ v_height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
 # For having a constant size in every resolution
 scale = 0.05
 fontScale = min(v_width, v_height)/(25/scale)
-
+font = cv.FONT_HERSHEY_DUPLEX
 # For having a constant size of rectangle in every resolution
 rec_width = int(v_width/1.8)
 rec_height = int(v_height/6.8)
@@ -246,13 +248,13 @@ if choice == '1':
             v_text = "Number of vehicles=" + str(prev_veh_count)
             v_frame = cv.rectangle(v_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
             # 0.8
-            v_frame = cv.putText(v_frame, v_text, (10, 30), cv.FONT_HERSHEY_COMPLEX, fontScale, (0, 0, 255), 0, cv.LINE_AA)
+            v_frame = cv.putText(v_frame, v_text, (10, 30), font, fontScale, (0, 0, 255), 0, cv.LINE_AA)
             # show the frame
             cv.imshow(v_window, v_frame)
             save_veh.write(v_frame)
             p_text = "Number of pedestrians=" + str(prev_ped_count)
             p_frame = cv.rectangle(p_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
-            p_frame = cv.putText(p_frame, p_text, (10, 30), cv.FONT_HERSHEY_COMPLEX, fontScale, (0, 0, 255), 0, cv.LINE_AA)
+            p_frame = cv.putText(p_frame, p_text, (10, 30), font, fontScale, (0, 0, 255), 0, cv.LINE_AA)
             save_ped.write(p_frame)
             cv.imshow(p_window, p_frame)
             if cv.waitKey(1) & 0XFF == ord('q'):
@@ -282,14 +284,14 @@ else:
             # For vehicles
             v_text = "Number of vehicles=" + str(prev_veh_count)
             v_frame = cv.rectangle(v_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
-            v_frame = cv.putText(v_frame, v_text, (10, 30), cv.FONT_HERSHEY_COMPLEX, fontScale, (255, 255, 255), 0)
+            v_frame = cv.putText(v_frame, v_text, (10, 30), font, fontScale, (255, 255, 255), 0)
             # show the frame
             cv.imshow(v_window, v_frame)
 
             # For pedestrians
             p_text = "Number of pedestrians=" + str(prev_ped_count)
             p_frame = cv.rectangle(p_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
-            p_frame = cv.putText(p_frame, p_text, (10, 30), cv.FONT_HERSHEY_PLAIN, fontScale, (255, 255, 255), 0)
+            p_frame = cv.putText(p_frame, p_text, (10, 30), font, fontScale, (255, 255, 255), 0)
             # show the frame
             cv.imshow(p_window, p_frame)
             if cv.waitKey(1) & 0XFF == ord('q'):
