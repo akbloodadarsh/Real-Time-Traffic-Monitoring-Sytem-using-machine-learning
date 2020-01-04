@@ -110,7 +110,8 @@ def postprocess(frame, p_frame, v_frame, outs, prev_veh_count, prev_ped_count):
             count = count + 1
         if classIDs[i] == 0:
             p_count = p_count + 1
-        v_frame, p_frame = drawPred(classIDs[i], left, top, left + width, top + height, v_frame, p_frame)
+        p_frame = drawPredP(classIDs[i], left, top, left + width, top + height, p_frame)
+        v_frame = drawPredV(classIDs[i], left, top, left + width, top + height, v_frame)
     # if previous count is different than current count then print & store count in previous count
     if prev_veh_count != count:
         prev_veh_count = count
@@ -119,15 +120,20 @@ def postprocess(frame, p_frame, v_frame, outs, prev_veh_count, prev_ped_count):
     return prev_veh_count, prev_ped_count, p_frame, v_frame
 
 
-def drawPred(classId, left, top, right, bottom, v_frame, p_frame):
+def drawPredP(classId, left, top, right, bottom, p_frame):
+    # if any cond gets true draw bounding boxes(1=bicycle,2=car,3=motorbike,5=bus,7=truck)
+    if classId == 0:
+        # Draw a bounding box.
+        p_frame = cv.rectangle(p_frame, (left, top), (right, bottom), (255, 178, 50), 3)
+    return p_frame
+
+
+def drawPredV(classId, left, top, right, bottom, v_frame):
     # if any cond gets true draw bounding boxes(1=bicycle,2=car,3=motorbike,5=bus,7=truck)
     if classId == 1 or classId == 2 or classId == 3 or classId == 5 or classId == 7:
         # Draw a bounding box.
         v_frame = cv.rectangle(v_frame, (left, top), (right, bottom), (255, 178, 50), 3)
-    elif classId == 0:
-        # Draw a bounding box.
-        p_frame = cv.rectangle(p_frame, (left, top), (right, bottom), (255, 178, 50), 3)
-    return v_frame, p_frame
+    return v_frame
 
 
 '''Generally in a sequential CNN network there will be only one output layer at the end. In the YOLO v3 architecture we
@@ -177,6 +183,26 @@ def filtering(fil_frame):
     return fil_frame
 
 
+def p_show(p_frame, sv, prev_ped_count, rec_width, rec_height, font, fontScale, p_window):
+    p_text = "Number of people=" + str(prev_ped_count)
+    p_frame = cv.rectangle(p_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
+    p_frame = cv.putText(p_frame, p_text, (10, 30), font, fontScale, (255, 255, 255), 0)
+    # show the frame
+    if sv == 1:
+        save_ped.write(p_frame)
+    cv.imshow(p_window, p_frame)
+
+
+def v_show(v_frame, sv, prev_veh_count, rec_width, rec_height, font, fontScale, v_window):
+    v_text = "Number of vehicles=" + str(prev_veh_count)
+    v_frame = cv.rectangle(v_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
+    v_frame = cv.putText(v_frame, v_text, (10, 30), font, fontScale, (255, 255, 255), 0)
+    # show the frame
+    if sv == 1:
+        save_veh.write(v_frame)
+    cv.imshow(v_window, v_frame)
+
+
 def execute():
     # *****MAIN***** #
     file = str(Entry1.get())
@@ -201,14 +227,19 @@ def execute():
 
     # To import video
     cap = cv.VideoCapture(file)
-    if cap.isOpened() != True:
-        if cam_feed != 0:
-            cam_feed = 1
-            cap = cv.VideoCapture(cam_feed)
-            if cap.isOpened() != True:
+
+    if not cap.isOpened() and cam_feed == 0:
+        exit()
+    if not cap.isOpened():
+        try:
+            if cam_feed != 0:
                 cam_feed = 0
                 cap = cv.VideoCapture(cam_feed)
-
+                if not cap.isOpened():
+                    cam_feed = 1
+                    cap = cv.VideoCapture(cam_feed)
+        except e:
+            print("cant open camera by 1\nTrying from 0\n")
     v_width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
     v_height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
 
@@ -247,25 +278,19 @@ def execute():
                 blob = cv.dnn.blobFromImage(frame, 1 / 255, (inpWidth, inpHeight), [0, 0, 0], 1, crop=False)
                 # Set the i/p blob
                 net.setInput(blob)
-                # outs:-Array that contains all info about objects detected,their position,confidence about the detection
+                # outs:-Array that contains all info about objects detected,their position,confidence about detection
                 # forward:- (blob already set)compute o/p of all the layers and returns the blob
                 outs = net.forward(getOutputsNames(net))
                 # send the frame, detected obj,previous count and return the updated previous count
                 prev_veh_count, prev_ped_count, p_frame, v_frame = postprocess(frame, p_frame, v_frame, outs,
-                                                                               prev_veh_count
-                                                                               , prev_ped_count)
-                v_text = "Number of vehicles=" + str(prev_veh_count)
-                v_frame = cv.rectangle(v_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
-                # 0.8
-                v_frame = cv.putText(v_frame, v_text, (10, 30), font, fontScale, (0, 0, 255), 0, cv.LINE_AA)
-                # show the frame
-                cv.imshow(v_window, v_frame)
-                save_veh.write(v_frame)
-                p_text = "Number of pedestrians=" + str(prev_ped_count)
-                p_frame = cv.rectangle(p_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
-                p_frame = cv.putText(p_frame, p_text, (10, 30), font, fontScale, (0, 0, 255), 0, cv.LINE_AA)
-                save_ped.write(p_frame)
-                cv.imshow(p_window, p_frame)
+                                                                               prev_veh_count, prev_ped_count)
+                sv = 1
+                # For vehicles
+                v_show(v_frame, sv, prev_veh_count, rec_width, rec_height, font, fontScale, v_window)
+
+                # For pedestrians
+                p_show(p_frame, sv, prev_ped_count, rec_width, rec_height, font, fontScale, p_window)
+
                 if cv.waitKey(1) & 0XFF == ord('q'):
                     break
         save_ped.release()
@@ -288,22 +313,16 @@ def execute():
                 outs = net.forward(getOutputsNames(net))
                 # send the frame, detected obj,previous count and return the updated previous count
                 prev_veh_count, prev_ped_count, p_frame, v_frame = postprocess(frame, p_frame, v_frame, outs,
-                                                                               prev_veh_count
-                                                                               , prev_ped_count)
+                                                                               prev_veh_count, prev_ped_count)
 
-                # For vehicles
-                v_text = "Number of vehicles=" + str(prev_veh_count)
-                v_frame = cv.rectangle(v_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
-                v_frame = cv.putText(v_frame, v_text, (10, 30), font, fontScale, (255, 255, 255), 0)
-                # show the frame
-                cv.imshow(v_window, v_frame)
+                sv = 0
 
                 # For pedestrians
-                p_text = "Number of pedestrians=" + str(prev_ped_count)
-                p_frame = cv.rectangle(p_frame, (0, 0), (rec_width, rec_height), (0, 0, 0), -1)
-                p_frame = cv.putText(p_frame, p_text, (10, 30), font, fontScale, (255, 255, 255), 0)
-                # show the frame
-                cv.imshow(p_window, p_frame)
+                p_show(p_frame, sv, prev_ped_count, rec_width, rec_height, font, fontScale, p_window)
+
+                # For vehicles
+                v_show(v_frame, sv, prev_veh_count, rec_width, rec_height, font, fontScale, v_window)
+
                 if cv.waitKey(1) & 0XFF == ord('q'):
                     break
     cv.destroyAllWindows()
@@ -311,9 +330,10 @@ def execute():
 
 if __name__ == '__main__':
     mainwindow = Tk()
-    mainwindow.title("Vehicle & Pedestrians D&C")
-    Label(mainwindow, text="Vehicle & Pedestrians D&C", bg="black", fg="white").pack(side=TOP, fill=X, padx=2, pady=2)
-    photo = PhotoImage(file="download.png")
+    mainwindow.title("VPDC")
+    Label(mainwindow, text="Vehicle and Pedestrians Detection & Counter", bg="black", fg="white").pack(side=TOP, fill=X,
+                                                                                                       padx=2, pady=2)
+    photo = PhotoImage(file="VPDC.png")
     Label(mainwindow, image=photo, bg="black", fg="white").pack(side=TOP, fill=X)
     Label(mainwindow, text="File Name", bg="black", fg="white").pack(side=TOP, fill=X, padx=2, pady=2)
     Entry1 = Entry(mainwindow)
