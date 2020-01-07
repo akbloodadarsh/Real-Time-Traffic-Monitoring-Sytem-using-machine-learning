@@ -208,13 +208,15 @@ def execute():
     file = str(Entry1.get())
     choice = ch.get()
     cam_feed = feed.get()
+    if file == "" and cam_feed == 0:
+        exit()
     # read the weights and configuration and creates the network
     net = cv.dnn.readNetFromDarknet(modelConf, modelWeights)
     # Ask network to use specific computation backend where it supported
     net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
     # Ask network to make computations on specific target device
     net.setPreferableTarget(cv.dnn.DNN_TARGET_CPU)
-
+    
     # To set the name of window
     v_window = 'vehicles'
     p_window = 'pedestrians'
@@ -226,20 +228,21 @@ def execute():
     cv.resizeWindow(p_window, 700, 450)
 
     # To import video
-    cap = cv.VideoCapture(file)
+    if cam_feed != 0 and file != "":
+        cam_feed = 0
+        cap = cv.VideoCapture(cam_feed)
+        if not cap.isOpened():
+            cam_feed = 1
+            cap = cv.VideoCapture(cam_feed)
+    elif cam_feed != 0:
+        cam_feed = 0
+        cap = cv.VideoCapture(cam_feed)
+        if not cap.isOpened():
+            cam_feed = 1
+            cap = cv.VideoCapture(cam_feed)
+    else:
+        cap = cv.VideoCapture(file)
 
-    if not cap.isOpened() and cam_feed == 0:
-        exit()
-    if not cap.isOpened():
-        try:
-            if cam_feed != 0:
-                cam_feed = 0
-                cap = cv.VideoCapture(cam_feed)
-                if not cap.isOpened():
-                    cam_feed = 1
-                    cap = cv.VideoCapture(cam_feed)
-        except e:
-            print("cant open camera by 1\nTrying from 0\n")
     v_width = int(cap.get(cv.CAP_PROP_FRAME_WIDTH))
     v_height = int(cap.get(cv.CAP_PROP_FRAME_HEIGHT))
 
@@ -273,8 +276,8 @@ def execute():
             p_frame = frame
             v_frame = frame
             if ret:
-                # Create a 4D blob from a frame cv.dnn.blobFromImage(image,scale_factor,size,mean, swapRB,crop,depth)
-                '''a blob is a group of connected pixels,neighbouring pixels'''
+                '''Create a 4D blob from a frame cv.dnn.blobFromImage(image,scale_factor,size,mean, swapRB,crop,depth)
+                a blob is a group of connected pixels,neighbouring pixels'''
                 blob = cv.dnn.blobFromImage(frame, 1 / 255, (inpWidth, inpHeight), [0, 0, 0], 1, crop=False)
                 # Set the i/p blob
                 net.setInput(blob)
@@ -290,7 +293,6 @@ def execute():
 
                 # For pedestrians
                 p_show(p_frame, sv, prev_ped_count, rec_width, rec_height, font, fontScale, p_window)
-
                 if cv.waitKey(1) & 0XFF == ord('q'):
                     break
         save_ped.release()
