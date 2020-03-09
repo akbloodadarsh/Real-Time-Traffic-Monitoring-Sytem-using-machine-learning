@@ -1,4 +1,4 @@
-<img align="center" src="https://github.com/akbloodadarsh/Vehicle-Pedestrian-Detection-and-Counter/blob/master/VPDC.png?raw=true">
+<p align="center"><img src="https://github.com/akbloodadarsh/Vehicle-Pedestrian-Detection-and-Counter/blob/master/VPDC.png?raw=true"></p>
 <h1 align="center">Vehicle-Pedestrain-detection-And-Counter</h1>
 
 To download **weights**
