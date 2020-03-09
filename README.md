@@ -3,5 +3,5 @@
 
 <p align="center">Press the button to download <b>weights</b></p>
 
-<p align="center"><img src="http://www.presentationpro.com/images/product/medium/slide/PPP_CGENE_LT3_Presentation-PowerPoint-Slide-Graphic_Push_Button_Up.jpg"><a src="
+<p align="center"><img href="http://www.presentationpro.com/images/product/medium/slide/PPP_CGENE_LT3_Presentation-PowerPoint-Slide-Graphic_Push_Button_Up.jpg"><a src="
 https://drive.google.com/file/d/1ynnhkMcZGlq0-eTau4Q9l1u5dAR0bVp8/view?usp=sharing"></p>
