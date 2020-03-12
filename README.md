@@ -16,6 +16,9 @@
 <p align="center">
   <img src="https://github.com/akbloodadarsh/None-of-your-concern/blob/master/VPDC/2.png?raw=true">
 </p>
+### coding this is easy, finding the content and how to get things together was hard
+# steps to run the code
+## 1.Just download the weights and paste it in the folder where you have downloaded the repositiory and voila, it aint gonna work!until you follow the rest of the steps!
 
  <p align="center">
     <img src="https://github.com/akbloodadarsh/None-of-your-concern/blob/master/VPDC/1.png?raw=true">
