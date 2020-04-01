@@ -16,10 +16,9 @@
 <p align="center">
   <img src="https://github.com/akbloodadarsh/None-of-your-concern/blob/master/VPDC/2.png?raw=true">
 </p>
-<h3> coding this was easy, finding the content and how to put things together was hard</h3>
-<h2>steps to run the code</h2>
+<h2>steps to run the program</h2>
 <h2>
-  <ol>1.Just download the weights and paste it in the folder where you have downloaded the repositiory and voila, it aint       gonna work!until you follow the rest of the steps!
+  <ol>1.Download the weights and paste it in the folder where you have downloaded the repositiory and voila, it aint       gonna work!until you follow the rest of the steps!
   </ol>
 </h2>
  <p align="center">
