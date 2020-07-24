@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="https://github.com/akbloodadarsh/Vehicle-Pedestrian-Detection-and-Counter/blob/master/VPDC.png?raw=true">
+ </p>
 <h1 align="center">
   Vehicle-Pedestrain-Detection-And-Counter
 </h1>
