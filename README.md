@@ -5,7 +5,6 @@
   Vehicle-Pedestrain-Detection-And-Counter
 </h1>
 <p align="center">
-  <img src="https://github.com/akbloodadarsh/Vehicle-Pedestrian-Detection-and-Counter/blob/master/VPDC.png?raw=true">
   <img src="https://github.com/akbloodadarsh/None-of-your-concern/blob/master/VPDC/2.png?raw=true">
   <img src="https://github.com/akbloodadarsh/None-of-your-concern/blob/master/VPDC/1.png?raw=true">
  </p>
